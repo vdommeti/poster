@@ -1,0 +1,8 @@
+Data from
+https://sites.google.com/site/las2016data/data
+"ThisOne.xlsx" version 7
+
+Selent, D., Patikorn, T., & Heffernan, N. (2016, April). ASSISTments Dataset from Multiple Randomized Controlled Experiments. In Proceedings of the Third (2016) ACM Conference on Learning@ Scale (pp. 181-184). ACM.
+
+
+Dataset has changed slightly from numbers reported in paper
