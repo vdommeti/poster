@@ -6,10 +6,12 @@ import dataset.Dataset;
 import fileutility.FileUtilityExtra;
 import fileutility.HeaderRowOptions;
 
+
 public class Stats
 {
 	private List<ExperimentData> experimentDataList;
 	private String inputFilePath;
+	ArrayList<Double> effectSizeList = new ArrayList<Double>();
 	
 	public Stats(String inputFilePath)
 	{
@@ -53,6 +55,9 @@ public class Stats
 			experimentData.setEffectiveSampleSize(effectiveSampleSize);
 			experimentData.setEffectSize(effectSize);
 			
+			effectSizeList.add(effectSize);
+			
+			
 			experimentDataList.add(experimentData);
 		}
 	}
@@ -62,17 +67,27 @@ public class Stats
 		//get some initial estimates of priors
 		//perhaps try different initialProbability values later
 		
-		double initialProbability = 0.05;
-		double initialVariance = 0.0246; //TODO HARD CODED for our data (should be calculated)
+		//double initialProbability = .05;
+		//double initialVariance = 0.4980; //TODO HARD CODED for our data (should be calculated)
+		List<Double> listOfProbabilities = new ArrayList<>();
+		List<Double> listOfVariance = new ArrayList<>();
 		
+		double initialVariance = Utils.calculateInitialV(effectSizeList);
+		
+		for(double i =0.05;i<1;i=i+0.05)
+		{
+		double initialProbability = i;
 		ExpectationMaximization em = new ExpectationMaximization(initialProbability, initialVariance);
 		em.runExpectationMaximization(experimentDataList);
 		
 		double probability = em.getExperimentProbability();
 		double variance = em.getEffectSizesVariance();
+		listOfProbabilities.add(probability);
+		listOfVariance.add(variance);
 		
-		System.out.println(probability);
-		System.out.println(variance);
+		System.out.println(listOfProbabilities);
+		System.out.println(listOfVariance);
+		}
 		
 	}
 
