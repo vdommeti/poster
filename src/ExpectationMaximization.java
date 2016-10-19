@@ -15,6 +15,10 @@ public class ExpectationMaximization
 	//when to determine convergence of EM
 	double epsilon;
 	
+	int iterationCount =1; ;
+	
+	
+	
 	public ExpectationMaximization()
 	{
 		experimentProbability = -1.0;
@@ -68,13 +72,14 @@ public class ExpectationMaximization
 	
 	public void runExpectationMaximization(List<ExperimentData> experimentDataList)
 	{
-		int iterationCount = 1;
+		
 		
 		double posteriorExperimentProbability = Double.MAX_VALUE;
 		double difference = Math.abs(experimentProbability - posteriorExperimentProbability);
 		
 		//TODO
 		//LEARN HYPER PRIORS FROM STAN MODEL HERE
+		
 		
 		while(difference > epsilon)
 		{
@@ -157,5 +162,7 @@ public class ExpectationMaximization
 			System.out.println("Probability = " + experimentProbability);
 			iterationCount++;
 		}
+		
 	}
+	
 }
