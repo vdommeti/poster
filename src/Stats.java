@@ -71,8 +71,6 @@ public class Stats
 		//double initialVariance = 0.4980; //TODO HARD CODED for our data (should be calculated)
 		List<Double> listOfProbabilities = new ArrayList<>();
 		List<Double> listOfVariance = new ArrayList<>();
-		//to know total iterations for different prior values
-		ArrayList<Integer> iterationCountList = new ArrayList<>();
 		
 		double initialVariance = Utils.calculateInitialV(effectSizeList);
 		
@@ -86,13 +84,10 @@ public class Stats
 		double variance = em.getEffectSizesVariance();
 		listOfProbabilities.add(probability);
 		listOfVariance.add(variance);
-		iterationCountList.add(em.iterationCount);
-		}
 		
 		System.out.println(listOfProbabilities);
 		System.out.println(listOfVariance);
-		System.out.println(iterationCountList);
-		
+		}
 		
 	}
 
