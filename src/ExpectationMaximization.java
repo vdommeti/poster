@@ -19,7 +19,7 @@ public class ExpectationMaximization
 	{
 		experimentProbability = -1.0;
 		effectSizesVariance = -1.0;
-		epsilon = 0.01;
+		epsilon = 0.00001;
 	}
 	
 	public ExpectationMaximization(double experimentProbability, double effectSizesVariance)
@@ -72,10 +72,7 @@ public class ExpectationMaximization
 		
 		double posteriorExperimentProbability = Double.MAX_VALUE;
 		double difference = Math.abs(experimentProbability - posteriorExperimentProbability);
-		
-		//TODO
-		//LEARN HYPER PRIORS FROM STAN MODEL HERE
-		
+				
 		while(difference > epsilon)
 		{
 			System.out.println("EM Iteration " + iterationCount);

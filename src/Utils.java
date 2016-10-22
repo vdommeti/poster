@@ -1,4 +1,5 @@
-import java.util.ArrayList;
+
+import java.util.List;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
@@ -17,12 +18,20 @@ public class Utils {
 		return effectSize;
 	}
 
-	public static double calculateInitialV(ArrayList<Double> effectSizeList) {
-		DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics();
-		for (int i = 0; i < effectSizeList.size(); i++) {
-			descriptiveStatistics.addValue(effectSizeList.get(i));
-		}
-		return descriptiveStatistics.getVariance();
+	public static double calculateVariance(List<Double> effectSizeList)
+	{
+		return Math.pow(calculateStandardError(effectSizeList), 2);
 	}
 
+	public static double calculateStandardError(List<Double> effectSizeList)
+	{
+		DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics();
+		
+		for (int i = 0; i < effectSizeList.size(); i++)
+		{
+			descriptiveStatistics.addValue(effectSizeList.get(i));
+		}
+		
+		return descriptiveStatistics.getStandardDeviation();
+	}
 }

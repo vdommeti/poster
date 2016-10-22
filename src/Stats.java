@@ -11,11 +11,12 @@ public class Stats
 {
 	private List<ExperimentData> experimentDataList;
 	private String inputFilePath;
-	ArrayList<Double> effectSizeList = new ArrayList<Double>();
+	private List<Double> effectSizeList;
 	
 	public Stats(String inputFilePath)
 	{
 		experimentDataList = new ArrayList<ExperimentData>();
+		effectSizeList = new ArrayList<Double>();
 		this.inputFilePath = inputFilePath;
 	}
 	
@@ -56,46 +57,44 @@ public class Stats
 			experimentData.setEffectSize(effectSize);
 			
 			effectSizeList.add(effectSize);
-			
-			
+
 			experimentDataList.add(experimentData);
 		}
 	}
 	
-	public void runEM()
+	public ExpectationMaximization runEM(double initialProbability)
 	{
-		//get some initial estimates of priors
-		//perhaps try different initialProbability values later
+		double initialVariance = Utils.calculateVariance(effectSizeList);
 		
-		//double initialProbability = .05;
-		//double initialVariance = 0.4980; //TODO HARD CODED for our data (should be calculated)
-		List<Double> listOfProbabilities = new ArrayList<>();
-		List<Double> listOfVariance = new ArrayList<>();
-		
-		double initialVariance = Utils.calculateInitialV(effectSizeList);
-		
-		for(double i =0.05;i<1;i=i+0.05)
-		{
-		double initialProbability = i;
 		ExpectationMaximization em = new ExpectationMaximization(initialProbability, initialVariance);
 		em.runExpectationMaximization(experimentDataList);
 		
-		double probability = em.getExperimentProbability();
-		double variance = em.getEffectSizesVariance();
-		listOfProbabilities.add(probability);
-		listOfVariance.add(variance);
-		
-		System.out.println(listOfProbabilities);
-		System.out.println(listOfVariance);
-		}
-		
+		return em;
+	}
+	
+	public double runStanModel(double probability)
+	{
+		double initialVariance = Utils.calculateVariance(effectSizeList);
+		StanModel stan = new StanModel(probability, initialVariance);
+		double p = stan.runStanModel(experimentDataList);
+		return p;
 	}
 
 	public static void main(String[] args) throws IOException
 	{
 		Stats stats = new Stats(args[0]);
 		stats.readData();
-		stats.runEM();
+		
+		//experiment for different  initial priors for EM
+		for(double i =0.05; i<1; i=i+0.05)
+		{
+			ExpectationMaximization em = stats.runEM(i);
+			System.out.println(em.getExperimentProbability());
+			System.out.println(em.getEffectSizesVariance());
+		}
+		
+		//double p = stats.runStanModel(0.5);
+		//System.out.println(p);
 	}
 }
 
