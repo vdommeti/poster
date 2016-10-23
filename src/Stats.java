@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import dataset.Dataset;
@@ -72,14 +73,36 @@ public class Stats
 		return em;
 	}
 	
-	public double runStanModel(double probability)
-	{
-		double initialVariance = Utils.calculateVariance(effectSizeList);
-		StanModel stan = new StanModel(probability, initialVariance);
-		double p = stan.runStanModel(experimentDataList);
-		return p;
+	public void runConfidenceInterval()
+	{	 
+		List<Double> experimentProbailities = new ArrayList<>();
+		List<Double> experimentVariance = new ArrayList<>();
+		int bootStrapSampleCount =1000;
+		for(int i=0;i<bootStrapSampleCount;i++)
+		 {
+		  
+			ConfidenceIntervals confidenceIntervals = new ConfidenceIntervals();
+		    List<ExperimentData> resampleExperimentDataList=confidenceIntervals.getBootStrapSamples(experimentDataList);
+		    List<Double> effectSizeList = new ArrayList<>();
+		    double initialVariance;
+		    for(int j=0;j<resampleExperimentDataList.size();j++)
+		    	effectSizeList.add(resampleExperimentDataList.get(j).getEffectSize());
+		    initialVariance = Utils.calculateVariance(effectSizeList);
+		    ExpectationMaximization em = new ExpectationMaximization(0.4, initialVariance);
+		    em.runExpectationMaximization(resampleExperimentDataList);
+		    if(em.getExperimentProbability()<.002)
+		    {
+		    	System.out.println(" ");
+		    }
+		    experimentProbailities.add(em.getExperimentProbability());
+		    experimentVariance.add(em.getEffectSizesVariance());
+		}
+		Collections.sort(experimentProbailities);
+		double confidenceIntervalLower = experimentProbailities.get((int) (bootStrapSampleCount*.025));
+		double confidenceIntervalUpper = experimentProbailities.get((int) (bootStrapSampleCount*.975));
+		
+		System.out.println("Confidenec interval range is [" + confidenceIntervalLower + "," + confidenceIntervalUpper +  "]");
 	}
-
 	public static void main(String[] args) throws IOException
 	{
 		Stats stats = new Stats(args[0]);
@@ -89,10 +112,11 @@ public class Stats
 		for(double i =0.05; i<1; i=i+0.05)
 		{
 			ExpectationMaximization em = stats.runEM(i);
-			System.out.println(em.getExperimentProbability());
-			System.out.println(em.getEffectSizesVariance());
+			//System.out.println(em.getExperimentProbability());
+			//System.out.println(em.getEffectSizesVariance());
 		}
 		
+		stats.runConfidenceInterval();
 		//double p = stats.runStanModel(0.5);
 		//System.out.println(p);
 	}
